@@ -1,0 +1,23 @@
+{
+  "name": "assignment2",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dilkwak/Web322Lab4.git"
+  },
+  "author": "dillon kwak",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dilkwak/Web322Lab4/issues"
+  },
+  "homepage": "https://github.com/dilkwak/Web322Lab4#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
