@@ -17,7 +17,7 @@ const projectData = require("./modules/projects");
 const HTTP_PORT = process.env.PORT || 8080;
 
 app.use(express.static('public')); //- reminder do not forget to mark the "public" folder as "static
-
+app.use(express.static(path.join(__dirname, "public")));
 projectData.initialize();
 
 app.get('/', (req, res) => {
