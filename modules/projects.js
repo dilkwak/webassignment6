@@ -35,13 +35,15 @@ function getAllProjects(){
     //returns the complete "projects" array
     return new Promise((resolve, reject) => {
         resolve(projects);
+            console.log("deleted");
+
     });
 }
 
 function getProjectById(projectId){
     //return a specific project object from the "projects" array whose "id" value matches the value of the "projectId" parameter. 
     return new Promise((resolve, reject) => {
-        let resultID = projects.find((prj) => {return prj.id === projectId});
+        let resultID = projects.find((prj) => prj.id == projectId);
         if (resultID == undefined){
             reject('Unable to find requested project');
         } else {
@@ -57,8 +59,6 @@ function getProjectsBySector(sector){
     //"sector" parameter may contain only part of the sector string.
     return new Promise((resolve, reject) => {
         let sectorLow = sector.toLowerCase();
-        //console.log(sectorLow);
-        console.log(projects);
         let matchPrj = projects.filter((prj) => {return prj.sector.toLowerCase().includes(sectorLow)});
         console.log(matchPrj);
 

@@ -4,7 +4,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "tw:build": "tailwindcss build -i ./public/css/tailwind.css -o ./public/css/main.css --watch"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,11 @@
   "homepage": "https://github.com/dilkwak/Web322Lab4#readme",
   "description": "",
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.16",
+    "daisyui": "^4.12.24",
     "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
   }
 }

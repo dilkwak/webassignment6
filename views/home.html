@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/main.css" />
+    <title>Climate Solutions</title>
+</head>
+<body>
+    <h1>Climate Solutions</h1>
+    <div class="navbar bg-base-100">
+    <div class="flex-1">
+        <a href="/" class="btn btn-ghost text-xl">Climate Solutions</a>
+    </div>
+
+    <div class="navbar-center flex"></div>
+        <ul class="menu menu-horizontal px-1">
+        <li><a class="active" href="/about">About</a></li>
+        <li>
+            <details>
+            <summary>Parent</summary>
+            <ul class="p-2 bg-base-100 right-0">
+                <li><a href="/solutions/projects?sector=Energy">Energy</a></li>
+                <li><a href="/solutions/projects?sector=Transport">Transport</a></li>
+                <li><a href="/solutions/projects?sector=Agriculture">Agriculture</a></li>
+            </ul>
+            </details>
+        </li>
+        </ul>
+    </div>
+
+    <div class="container mx-auto">
+        <div class="hero">
+            <div class="hero-content text-center">
+                <div class="max-w-md">
+                    <h1 class="text-5xl font-bold">Check out projects</h1>
+                    <br/>
+                    <a class="btn btn-primary mx-auto" href="/solutions/projects">All projects</a>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+            <div class="card w-96 bg-base-100 shadow-xl">
+                <div class="card-body text-center">
+                    <img src="https://drawdown.org/sites/default/files/solutions2020/solution_seafloorprotection.jpg" alt="Seafloor Protection" class="w-full">
+                    <h2 class="card-title">Seafloor Protection</h2>
+                    <p>Vast amounts of carbon stored in seafloor sediments risk release by bottom-trawling fishing. Bottom-trawling bans and establishment of Marine Protected Areas can protect this important carbon sink.</p>
+                    <div class="card-actions justify-end">
+                    <a class="btn btn-primary mx-auto" href="/solutions/projects/30">Project 30 Info</a>
+                    </div>
+                </div>
+            </div>
+                <div class="card w-96 bg-base-100 shadow-xl">
+                    <div class="card-body text-center">
+                        <img src="https://drawdown.org/sites/default/files/solutions2020/solution_grid_flexibility.jpg" alt="Grid Flexibility" class="w-full">
+                        <h2 class="card-title">Grid Flexibility</h2>
+                        <p>Smarter, more flexible electric grids can cut energy losses. They also are critical to mainstreaming renewables, which are more variable than conventional energy sources.</p>
+                        <div class="card-actions justify-end">
+                    <a class="btn btn-primary mx-auto" href="/solutions/projects/29">Project 29 Info</a>
+                    </div>
+                </div>
+            </div>
+                <div class="card w-96 bg-base-100 shadow-xl">
+                    <div class="card-body text-center">
+                        <img src="https://drawdown.org/sites/default/files/solutions2020/solution_electric_bicycles.jpg" alt="Electric Bicycles" class="w-full">
+                        <h2 class="card-title">Electric Bicycles</h2>
+                        <p>Battery-powered motors can boost the use of bicycles, reducing greenhouse gas emissions from cars.</p>
+                        <div class="card-actions justify-end">
+                        <a class="btn btn-primary mx-auto" href="/solutions/projects/28">Project 28 Info</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
