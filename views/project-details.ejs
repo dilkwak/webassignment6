@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= project.title %></title>
+    <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+<div class="navbar bg-base-100">
+    <div class="flex-1">
+        <a href="/" class="btn btn-ghost text-xl">Climate Solutions</a>
+    </div>
+    <%- include('partials/navbar', { page: "/solutions/projects" }) %>
+</div>
+
+<div class="container mx-auto px-6 py-10">
+    <div class="hero mb-10">
+        <div class="hero-content text-center">
+            <div class="max-w-2xl">
+                <h1 class="text-4xl font-bold mb-2"><%= project.title %></h1>
+                <p>Below is more info about: <strong><%= project.title %></strong></p>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <img src="<%= project.feature_img_url %>" class="w-full rounded shadow" alt="image"/>
+        <div>
+            <p style="margin-bottom: 1rem;"><b>Intro:</b> <%= project.intro_short %></p>
+            <p><b>Impact:</b> <%= project.impact %></p>
+
+            <div style="margin-top: 1.5rem;">
+                <a href="<%= project.original_source_url %>" target="_blank" class="btn btn-primary">More Info</a>
+            </div>
+            <div class="p-4 border mt-6 bg-gray-50">
+                <h3 style="font-weight: 600;">Inspiration</h3>
+                <p id="quote-text" class="italic text-gray-700">Loading quote...</p>
+                <p id="quote-author" class="text-sm text-gray-500 text-right"></p>
+            </div>
+            <div style="margin-top: 1.5rem;">
+                <a href="#" onclick="history.back(); return false;" class="btn btn-secondary">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("https://dummyjson.com/quotes/random")
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("quote-text").innerHTML = `"${data.quote}"`;
+                document.getElementById("quote-author").innerHTML = `— ${data.author}`;
+            })
+            .catch(err => {
+                console.error(err);
+            });
+        });
+    </script>
+</body>
+</html>

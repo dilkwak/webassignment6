@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="garden">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/main.css" />
+    <title>Projects</title>
+</head>
+<body>
+    <div class="navbar bg-base-100">
+        <div class="flex-1">
+            <a href="/" class="btn btn-ghost text-xl">Climate Solutions</a>
+        </div>
+        <%- include('partials/navbar') %>
+    </div>
+
+    <div class="container mx-auto">
+        <div class="hero">
+            <div class="hero-content text-center">
+                <div class="max-w-md">
+                    <h1 class="text-5xl font-bold">Check out projects</h1>
+                    <div class="my-4 flex flex-col gap-2">
+                        <a class="btn btn-primary" href="/solutions/projects">All projects</a>
+                        <div class="flex justify-center gap-2">
+                            <a class="btn btn-xs btn-primary" href="?sector=ind">Industry</a>
+                            <a class="btn btn-xs btn-primary" href="?sector=transportation">Transportation</a>
+                            <a class="btn btn-xs btn-primary" href="?sector=electricity">Electricity</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="my-10">
+            <h2 class="text-3xl font-bold mb-4 text-center">Project List</h2>
+            <table class="table-auto w-full border border-gray-300">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="border px-4 py-2">Title</th>
+                        <th class="border px-4 py-2">Sector</th>
+                        <th class="border px-4 py-2">Summary</th>
+                        <th class="border px-4 py-2">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (projects && projects.length > 0) { %>
+                        <% for (let i = 0; i < projects.length; i++) { %>
+                            <tr>
+                                <td class="border px-4 py-2"><%= projects[i].title %></td>
+                                <td class="border px-4 py-2">
+                                    <a href="/solutions/projects?sector=<%= encodeURIComponent(projects[i].sector) %>" class="btn btn-sm btn-outline">
+                                        <%= projects[i].sector %>
+                                    </a>
+                                </td>
+                                <td class="border px-4 py-2"><%= projects[i].summary_short %></td>
+                                <td class="border">
+                                    <a href="/solutions/projects/<%= projects[i].id %>" class="btn mt-2 btn-xs">Details</a>
+                                </td>
+                            </tr>
+                        <% } %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="text-center p-4">No projects found.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
