@@ -48,8 +48,8 @@
                             <tr>
                                 <td class="border px-4 py-2"><%= projects[i].title %></td>
                                 <td class="border px-4 py-2">
-                                    <a href="/solutions/projects?sector=<%= encodeURIComponent(projects[i].sector) %>" class="btn btn-sm btn-outline">
-                                        <%= projects[i].sector %>
+                                    <a href="/solutions/projects?sector=<%= projects[i]['Sector.sector_name'] %>" class="btn btn-sm btn-outline">
+                                        <%= projects[i]['Sector.sector_name'] %>
                                     </a>
                                 </td>
                                 <td class="border px-4 py-2"><%= projects[i].summary_short %></td>
