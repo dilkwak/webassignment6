@@ -18,6 +18,9 @@ const sequelize = new Sequelize('neondb','neondb_owner', 'npg_nuQGr7JUWwN2',{
         rejectUnauthorized: false },
 },
 });
+
+sequelize.authenticate().then().catch();
+
 //create the two models
 const Sector = sequelize.define('Sector', {
     id: {
@@ -180,6 +183,7 @@ function getAllSectors(){
 }
 
 function addProject(projectData){
+    console.log(projectData);
     return new Promise ((resolve, reject) => {
         sequelize.sync().then(()=>{
             Project.create({
@@ -191,8 +195,12 @@ function addProject(projectData){
                 original_source_url: projectData.original_source_url,
                 sector_id: projectData.sector_id
             })
-            .then(() => resolve ())
+            .then(() => {
+                console.log("added new project to database!");
+                resolve();
+            })
             .catch((err)=>{
+                console.log("Failed to add to database");
                 reject(err.errors[0].message);
             })
         })

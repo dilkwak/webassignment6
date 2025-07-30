@@ -22,6 +22,7 @@ const HTTP_PORT = process.env.PORT || 8080;
 app.set('view engine', 'ejs'); //.ejs will use EJS engine (templates)
 app.use(express.static('public')); //- reminder do not forget to mark the "public" folder as "static
 app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({extended:true}));
 projectData.initialize();
 
 app.get('/', (req, res) => {
@@ -123,15 +124,21 @@ app.get('/solutions/addProject', (req, res) => {
     });
 });
 
-// app.post('/solutions/addProject', (req, res) => {
-//     projectData.addProject(req.body)
-//         .then(() => {
-//             res.redirect('/solutions/projects');
-//         })
-//         .catch((err) => {
-//             res.render('500', { message: `I'm sorry, but we have encountered the following error: ${err}` });
-//         });
-// });
+app.post('/solutions/addProject', (req, res) => {
+    projectData.addProject(req.body)
+        .then(() => {
+            console.log("success!");
+            res.redirect('/solutions/projects');
+            // res.render("projects", {
+            //     projects: projects,
+            //     page: "/solutions/projects"
+            // });
+        })
+        .catch((err) => {
+            console.log("fail!");
+            res.render('500', { message: `error: ${err}`, page: "500"});
+        });
+});
 
 
 
