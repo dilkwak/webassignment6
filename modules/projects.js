@@ -183,7 +183,6 @@ function getAllSectors(){
 }
 
 function addProject(projectData){
-    console.log(projectData);
     return new Promise ((resolve, reject) => {
         sequelize.sync().then(()=>{
             Project.create({
@@ -207,6 +206,46 @@ function addProject(projectData){
     })
 }
 
+function editProject(projectData){
+    return new Promise ((resolve, reject) => {
+        sequelize.sync().then(()=>{
+            Project.update({
+                title: projectData.title,
+                feature_img_url: projectData.feature_img_url,
+                summary_short: projectData.summary_short,
+                intro_short: projectData.intro_short,
+                impact: projectData.impact,
+                original_source_url: projectData.original_source_url,
+                sector_id: projectData.sector_id
+            },{
+                where: { id: projectData.id }
+            })
+            .then(() => {
+                resolve();
+            })
+            .catch((err)=>{
+                reject(err.errors[0].message);
+            })
+        })
+    })
+}
+
+function deleteProject(id){
+    return new Promise ((resolve, reject) => {
+        sequelize.sync().then(()=>{
+            Project.destroy({
+                where: { id: id }
+            })
+            .then(() => {
+                resolve();
+            })
+            .catch((err)=>{
+                reject(err);
+            })
+        })
+    })
+}
+
 module.exports = { 
     Sector,
     Project,
@@ -215,6 +254,8 @@ module.exports = {
     getProjectById,
     getProjectsBySector,
     addProject,
-    getAllSectors
+    getAllSectors,
+    editProject,
+    deleteProject
 };
 

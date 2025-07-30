@@ -111,6 +111,7 @@ app.get('/solutions/projects/:id', (req, res) => {
             console.log("responded");
         });
 });
+
 app.get('/solutions/addProject', (req, res) => {    
     projectData.getAllSectors()
     .then((sector) => {
@@ -139,8 +140,53 @@ app.post('/solutions/addProject', (req, res) => {
             res.render('500', { message: `error: ${err}`, page: "500"});
         });
 });
+app.get('/solutions/editProject/:id', (req, res) => {    
+    projectData.getProjectById(req.params.id)
+    .then((project) => {
+        projectData.getAllSectors()
+            .then((sectors) => {
+                res.render('editProject', {
+                    project: project,
+                    projectId: req.params.id,
+                    sectors: sectors,
+                    page: '/solutions/addProject'
+                });
+            })
+            .catch((err) => {
+                res.render('500', { message: "Sectors Not Found" });
+            });
+        
+    })
+    .catch((err) => {
+        res.render('500', { message: "Project Not Found" });
+    });
+});
 
+app.post('/solutions/editProject', (req, res) => {
+    projectData.editProject(req.body)
+        .then((sectors) => {
+                //     res.render('deleteProject', {
+                //     project: project,
+                //     projectId: req.params.id,
+                //     sectors: sectors,
+                //     page: '/solutions/addProject'
+                // });
+            res.redirect('/solutions/projects');
+        })
+        .catch((err) => {
+            res.render('500', { message: `error: ${err}`, page: "500"});
+        });
+});
 
+app.get('/solutions/deleteProject/:id', (req,res) => {
+    projectData.deleteProject(req.params.id)
+    .then(() => {
+        res.redirect('/solutions/projects');
+    })
+    .catch((err) => {
+    res.render("500", { message: `I'm sorry, but we have encountered the following error: ${err}`, page: "500" });
+    });
+})
 
 app.use((req, res) => {
     res.status(404).render("404", { message: "Page Not Found" });
