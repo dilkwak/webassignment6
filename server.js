@@ -20,7 +20,6 @@ const HTTP_PORT = process.env.PORT || 8080;
 // const sector = req.query.sector;
 
 app.set('view engine', 'ejs'); //.ejs will use EJS engine (templates)
-app.use(express.static('public')); //- reminder do not forget to mark the "public" folder as "static
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({extended:true}));
 projectData.initialize();
