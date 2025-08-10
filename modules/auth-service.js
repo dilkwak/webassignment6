@@ -87,7 +87,41 @@ return new Promise((resolve, reject) => {
     .catch(()=> reject(`Unable to find user: ${userData.userName}`));
 })
 }//function
+/**
+ * ```function checkUser(userData) {
+    return new Promise(function (resolve, reject) {
+        User.find({ userName: userData.userName })
+            .exec()
+            .then((users) => {
+                if(users.length === 0) {
+                    reject(`Unable to find user: ${userData.userName}`);
+                }
 
+                bcrypt.compare(userData.password, users[0].password).then().catch(() => {
+                    reject(`Incorrect Password for user: ${userData.userName}`);
+                });
+
+                if(users[0].loginHistory.length == 8) {
+                    users[0].loginHistory.pop();
+                }
+
+                users[0].loginHistory.unshift({dateTime: (new Date()).toString(), userAgent: userData.userAgent});
+
+                User.updateOne({ userName: userData.userName }, { $set: {loginHistory: users[0].loginHistory} })
+                    .exec()
+                    .then(() => {
+                        resolve(users[0]);
+                    })
+                    .catch((err) => {
+                        reject(`There was an error verifying the user: ${err}`);
+                    });
+            })
+            .catch(() => {
+                reject(`Unable to find the user: ${userData.userName}`);
+            })
+    });
+}```
+ */
 module.exports = { 
     initialize,
     registerUser, 

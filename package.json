@@ -20,6 +20,7 @@
   "description": "",
   "dependencies": {
     "@tailwindcss/typography": "^0.5.16",
+    "client-sessions": "^0.8.0",
     "daisyui": "^4.12.24",
     "dotenv": "^17.2.1",
     "ejs": "^3.1.10",

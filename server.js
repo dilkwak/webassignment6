@@ -12,12 +12,14 @@
 *
 ********************************************************************************/
 
-require('dotenv').config();
+// require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const path = require('path');
 const app = express();
 const projectData = require("./modules/projects");
 const authData = require('./modules/auth-service');
+const clientSessions = require('client-sessions');
 
 const HTTP_PORT = process.env.PORT || 8080;
 // const sector = req.query.sector;
@@ -26,7 +28,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({extended:true}));
 app.set('views', path.join(__dirname, 'views')); //.ejs will use EJS engine (templates)
 app.set('view engine', 'ejs'); //.ejs will use EJS engine (templates)
-projectData.initialize();
+// projectData.initialize();
 
 app.get('/', (req, res) => {
     res.render("home", { page: "/" });
@@ -162,13 +164,13 @@ app.use((req, res) => {
 
 //assignment 6 
 
-projectData.initialize().then(function(){
-    app.listen(HTTP_PORT, function(){
-        console.log(`app listening on:  ${HTTP_PORT}`);
-    });
-}).catch(function(err){
-    console.log(`unable to start server: ${err}`);
-});
+// projectData.initialize().then(function(){
+//     app.listen(HTTP_PORT, function(){
+//         console.log(`app listening on:  ${HTTP_PORT}`);
+//     });
+// }).catch(function(err){
+//     console.log(`unable to start server: ${err}`);
+// });
 
 projectData.initialize()
 .then(authData.initialize)
@@ -179,7 +181,90 @@ projectData.initialize()
 }).catch(function(err){
     console.log(`unable to start server: ${err}`);
 });
+//step 4
+app.use(clientSessions({
+    cookieName: 'session',
+    // secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
+    secret: process.env.SESSION_SECRET || 'longUnGuessableString',
+    duration: 2 * 60 * 1000,
+    activeDuration: 60 * 1000
+}));
 
+app.use((req, res, next) => {
+    res.locals.session = req.session;
+    next();
+});
+
+app.get('/login', (req, res) => {
+    if (req.sessionx.user) return res.redirect('/dashboard');
+    res.render('login', { message: '' });
+});
+
+app.post('/login', (req, res) => {
+authData.checkUser({ ...req.body, userAgent: req.get('User-Agent') })
+    .then(user => {
+    req.session.user = {
+        userName: user.userName,
+        email: user.email,
+        loginHistory: user.loginHistory
+    };
+    res.redirect('/dashboard');
+    })
+    .catch(err => {
+    res.render('login', { message: String(err) });
+    });
+});
+app.get('/logout', (req, res) => {
+    req.session.reset();
+    res.redirect('/');
+});
+
+app.get('/dashboard', (req, res) => {
+    res.render('dashboard', { user: req.session.user });
+});
+
+//Update all routes that allow users to add, edit, or delete Projects
+function ensureLogin(req, res, next) {
+    if (!req.session || !req.session.user) return res.redirect('/login');
+    next();
+}
+
+// add
+app.get('/solutions/addProject', ensureLogin, (req, res) => {
+    projectData.getAllSectors()
+        .then((sector) => {
+        res.render('addProject', { sector, page: '/solutions/addProject' });
+    })
+    .catch(() => res.render('500', { message: 'Page Not Found' }));
+});
+app.post('/solutions/addProject', ensureLogin, (req, res) => {
+    projectData.addProject(req.body)
+    .then(() => res.redirect('/solutions/projects'))
+    .catch(err => res.render('500', { message: `error: ${err}`, page: '500' }));
+});
+
+// edit
+app.get('/solutions/editProject/:id', ensureLogin, (req, res) => {
+    projectData.getProjectById(req.params.id)
+        .then(project => projectData.getAllSectors()
+        .then(sectors => res.render('editProject', {
+            project, projectId: req.params.id, sectors, page: '/solutions/addProject'
+        }))
+    )
+    .catch(() => res.render('500', { message: 'Project or Sectors Not Found' }));
+});
+app.post('/solutions/editProject', ensureLogin, (req, res) => {
+    projectData.editProject(req.body)
+    .then(() => res.redirect('/solutions/projects'))
+    .catch(err => res.render('500', { message: `error: ${err}`, page: '500' }));
+});
+
+// delete
+app.get('/solutions/deleteProject/:id', ensureLogin, (req, res) => {
+    projectData.deleteProject(req.params.id)
+    .then(() => res.redirect('/solutions/projects'))
+    .catch(err => res.render('500', { message: `error: ${err}`, page: '500' }));
+});
 
 app.listen(HTTP_PORT, () => console.log("Server responded"));
 
