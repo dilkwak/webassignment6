@@ -8,14 +8,17 @@
 * 
 *  Name: Dillon Kwak 
 *  Student ID: 135389203 
-*  Date: July 27th 2025
+*  Date: Aug 10th 2025
 *
 ********************************************************************************/
 
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const app = express();
 const projectData = require("./modules/projects");
+const authData = require('./modules/auth-service');
+
 const HTTP_PORT = process.env.PORT || 8080;
 // const sector = req.query.sector;
 
@@ -48,31 +51,6 @@ app.get('/solutions/addProject', (req, res) => {
             res.status(500).send("Unable to load sectors.");
         });
 });
-
-// app.get('/solutions/projects', (req, res) => {
-//     projectData.getAllProjects().then((projects) => {
-//             // res.render("projects", {
-//             //     // projects: projects,
-//             //     // // sector: sector,
-//                 page: "/solutions/projects"
-//             // });
-//             console.log(projects); // see if this prints
-//             res.render("projects", { projects });
-//         }).catch((err) => {
-//             console.log("Rendering error:", err);
-//             res.status(404).render("404", {message: "Page Not Found", page: ""});
-//         });
-//     // else {
-//     //     projectData.getAllProjects().then((projects) => {
-//     //         res.render("projects", {
-//     //             projects: projects,
-//     //             page: "/solutions/projects"
-//     //         });
-//     //     }).catch((err) => {
-//     //         res.status(404).render("404", {message: err, page: ""});
-//     //     });
-//     // }s
-// });
 
 app.get('/solutions/projects', (req, res) => {
     const sector = req.query.sector;
@@ -130,10 +108,6 @@ app.post('/solutions/addProject', (req, res) => {
         .then(() => {
             console.log("success!");
             res.redirect('/solutions/projects');
-            // res.render("projects", {
-            //     projects: projects,
-            //     page: "/solutions/projects"
-            // });
         })
         .catch((err) => {
             console.log("fail!");
@@ -165,12 +139,6 @@ app.get('/solutions/editProject/:id', (req, res) => {
 app.post('/solutions/editProject', (req, res) => {
     projectData.editProject(req.body)
         .then((sectors) => {
-                //     res.render('deleteProject', {
-                //     project: project,
-                //     projectId: req.params.id,
-                //     sectors: sectors,
-                //     page: '/solutions/addProject'
-                // });
             res.redirect('/solutions/projects');
         })
         .catch((err) => {
@@ -192,4 +160,26 @@ app.use((req, res) => {
     res.status(404).render("404", { message: "Page Not Found" });
 });
 
+//assignment 6 
+
+projectData.initialize().then(function(){
+    app.listen(HTTP_PORT, function(){
+        console.log(`app listening on:  ${HTTP_PORT}`);
+    });
+}).catch(function(err){
+    console.log(`unable to start server: ${err}`);
+});
+
+projectData.initialize()
+.then(authData.initialize)
+.then(function(){
+    app.listen(HTTP_PORT, function(){
+        console.log(`app listening on:  ${HTTP_PORT}`);
+    });
+}).catch(function(err){
+    console.log(`unable to start server: ${err}`);
+});
+
+
 app.listen(HTTP_PORT, () => console.log("Server responded"));
+
