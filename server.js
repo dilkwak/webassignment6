@@ -182,6 +182,7 @@ projectData.initialize()
     console.log(`unable to start server: ${err}`);
 });
 //step 4
+
 app.use(clientSessions({
     cookieName: 'session',
     // secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
@@ -195,13 +196,44 @@ app.use((req, res, next) => {
     next();
 });
 
+function ensureLogin(req, res, next) {
+if (!req.session.user) {
+    res.redirect('/login');
+} else {
+    next();
+}
+}
+
 app.get('/login', (req, res) => {
-    if (req.sessionx.user) return res.redirect('/dashboard');
-    res.render('login', { message: '' });
+    if (req.session && req.session.user) 
+        return res.redirect('/solutions/projects');
+    res.render('login', { errorMessage: "", userName: "" });
+});
+app.get('/register', (req, res) => {
+    res.render('register', { errorMessage: "", successMessage: "", userName: "" });
+});
+
+app.post('/register', (req, res) => {
+    authData.registerUser(req.body)
+        .then(() => {
+        res.render('register', {
+            errorMessage: "",
+            successMessage: "User created",
+            userName: ""
+        });
+        })
+        .catch(err => {
+        res.render('register', {
+            errorMessage: String(err),
+            successMessage: "",
+            userName: req.body.userName || ""
+        });
+    });
 });
 
 app.post('/login', (req, res) => {
-authData.checkUser({ ...req.body, userAgent: req.get('User-Agent') })
+req.body.userAgent = req.get('User-Agent');
+    authData.checkUser(req.body)
     .then(user => {
     req.session.user = {
         userName: user.userName,
@@ -218,17 +250,15 @@ app.get('/logout', (req, res) => {
     req.session.reset();
     res.redirect('/');
 });
-
-app.get('/dashboard', (req, res) => {
-    res.render('dashboard', { user: req.session.user });
+app.get('/userHistory', ensureLogin, (req, res) => {
+    res.render('userHistory');
 });
 
-//Update all routes that allow users to add, edit, or delete Projects
-function ensureLogin(req, res, next) {
-    if (!req.session || !req.session.user) return res.redirect('/login');
-    next();
-}
+// app.get('/dashboard', (req, res) => {
+//     res.render('dashboard', { user: req.session.user });
+// });
 
+//Update all routes that allow users to add, edit, or delete Projects
 // add
 app.get('/solutions/addProject', ensureLogin, (req, res) => {
     projectData.getAllSectors()
@@ -248,7 +278,9 @@ app.get('/solutions/editProject/:id', ensureLogin, (req, res) => {
     projectData.getProjectById(req.params.id)
         .then(project => projectData.getAllSectors()
         .then(sectors => res.render('editProject', {
-            project, projectId: req.params.id, sectors, page: '/solutions/addProject'
+            project, 
+            projectId: req.params.id, 
+            sectors, page: '/solutions/addProject'
         }))
     )
     .catch(() => res.render('500', { message: 'Project or Sectors Not Found' }));
@@ -258,7 +290,6 @@ app.post('/solutions/editProject', ensureLogin, (req, res) => {
     .then(() => res.redirect('/solutions/projects'))
     .catch(err => res.render('500', { message: `error: ${err}`, page: '500' }));
 });
-
 // delete
 app.get('/solutions/deleteProject/:id', ensureLogin, (req, res) => {
     projectData.deleteProject(req.params.id)

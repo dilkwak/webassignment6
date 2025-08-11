@@ -31,6 +31,7 @@ return new Promise((resolve, reject) => {
     });
 });}
 
+
 function registerUser(userData){
 //the userData object has the following properties: .userName, .userAgent, .email, .password, .password2
 return new Promise((resolve,reject) => {
