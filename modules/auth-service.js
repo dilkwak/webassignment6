@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
 require('dotenv').config(); 
 
 if (!process.env.MONGODB) {
@@ -31,63 +33,63 @@ return new Promise((resolve, reject) => {
     });
 });}
 
-
-function registerUser(userData){
 //the userData object has the following properties: .userName, .userAgent, .email, .password, .password2
-return new Promise((resolve,reject) => {
-if (userData.password !== userData.password2){
-    return reject("Passwords do not match");
-} else {
-    let newUser = new User({
-    userName: userData.userName,
-    password: userData.password,
-    email: userData.email,
-    });
-
-    newUser.save()
-    .then(() => resolve())
-    .catch((err) => {
-        if(err && err.code === 11000){
-            return reject('User Name already taken');
-        } else {
-            return reject(`There was an error creating the user: ${err}`);
+function registerUser(userData) {
+    return new Promise((resolve, reject) => {
+        if (userData.password !== userData.password2) {
+        return reject("Passwords do not match");
         }
+        bcrypt.hash(userData.password, 10)
+        .then((hash) => {
+            const newUser = new User({
+            userName: userData.userName,
+            password: hash,
+            email: userData.email,
+            loginHistory: []
+            });
+
+            return newUser.save()
+            .then(() => resolve())
+            .catch((err) => {
+                if (err && err.code === 11000) {
+                return reject("User Name already taken");
+                }
+                return reject(`Error creating the user: ${err}`);
+            });
+        })
+        .catch(() => {
+            return reject("Error encrypting the password");
+        });
     });
 }
-});
-}//function
 
-
-function checkUser(userData){
+function checkUser(userData) {
 return new Promise((resolve, reject) => {
-    User.find({userName: userData.userName}).exec()
-    .then((users)=>{
-        if (users.length === 0) {
-            return reject(`Unable to find user: ${userData.userName}`);
-        }
-        const userLogin = users[0];
-        if(userLogin !== userData.password){
-            return reject(`Incorrect Password for user: ${userData.userName}`);
-        }
+    User.findOne({ userName: userData.userName }).exec()
+    .then(userLogin => {
+        if (!userLogin) return reject(`Unable to find user: ${userData.userName}`);
 
-        if(userLogin.loginHistory.length == 8){
-            return userLogin.loginHistory.pop();
-        }
+        return bcrypt.compare(userData.password, userLogin.password)
+        .then(match => {
+            if (!match) return reject(`Incorrect Password for user: ${userData.userName}`);
 
-        userLogin.loginHistory.unshift({
-            dateTime:(new Date()).toString(),
-            userAgent: userData.userAgent
+            const history = Array.isArray(userLogin.loginHistory) ? userLogin.loginHistory : [];
+            if (history.length === 8) history.pop();
+            history.unshift({ dateTime: new Date(), userAgent: userData.userAgent });
+
+            return User.updateOne(
+            { _id: userLogin._id },
+            { $set: { loginHistory: history } }
+            ).then(() => {
+            userLogin.loginHistory = history;
+            resolve(userLogin);
+            });
         });
-
-        User.updateHistory(
-            {userName: userLogin.userName},
-            {$set:{loginHistory:userLogin.loginHistory}}
-        ).then(() => resolve())
-        .catch((err) => reject (`There was an error verifying the user: ${err}`));
     })
-    .catch(()=> reject(`Unable to find user: ${userData.userName}`));
-})
-}//function
+    .catch(err => reject(`There was an error verifying the user: ${err}`));
+});
+}
+
 /**
  * ```function checkUser(userData) {
     return new Promise(function (resolve, reject) {

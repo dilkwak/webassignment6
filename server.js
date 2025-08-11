@@ -30,6 +30,27 @@ app.set('views', path.join(__dirname, 'views')); //.ejs will use EJS engine (tem
 app.set('view engine', 'ejs'); //.ejs will use EJS engine (templates)
 // projectData.initialize();
 
+app.use(clientSessions({
+    cookieName: 'session',
+    secret: process.env.SESSION_SECRET || 'longUnGuessableString',
+    duration: 2 * 60 * 1000,
+    activeDuration: 60 * 1000
+}));
+
+app.use((req, res, next) => {
+    res.locals.session = req.session || {};
+    res.locals.page = (req.path || '').split('?')[0];
+    next();
+});
+
+function ensureLogin(req, res, next) {
+if (!req.session || !req.session.user) {
+    res.redirect('/login');
+} else {
+    next();
+}
+}
+
 app.get('/', (req, res) => {
     res.render("home", { page: "/" });
 
@@ -84,7 +105,7 @@ app.get('/solutions/projects', (req, res) => {
 app.get('/solutions/projects/:id', (req, res) => {
     projectData.getProjectById(req.params.id)
         .then((project) => {
-            res.render("project-details", {project: project});
+            res.render("project-details", {project: project, page:""});
         })
         .catch((err) => {
             res.status(404).render("404", { message: "Page Not Found" });
@@ -158,92 +179,72 @@ app.get('/solutions/deleteProject/:id', (req,res) => {
     });
 })
 
-app.use((req, res) => {
-    res.status(404).render("404", { message: "Page Not Found" });
-});
-
 //assignment 6 
-
-// projectData.initialize().then(function(){
-//     app.listen(HTTP_PORT, function(){
-//         console.log(`app listening on:  ${HTTP_PORT}`);
-//     });
-// }).catch(function(err){
-//     console.log(`unable to start server: ${err}`);
-// });
 
 projectData.initialize()
 .then(authData.initialize)
-.then(function(){
+.then(()=>{
     app.listen(HTTP_PORT, function(){
-        console.log(`app listening on:  ${HTTP_PORT}`);
+        console.log(`app listening on: ${HTTP_PORT}`);
     });
 }).catch(function(err){
     console.log(`unable to start server: ${err}`);
 });
 //step 4
 
-app.use(clientSessions({
-    cookieName: 'session',
-    // secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
-    secret: process.env.SESSION_SECRET || 'longUnGuessableString',
-    duration: 2 * 60 * 1000,
-    activeDuration: 60 * 1000
-}));
-
-app.use((req, res, next) => {
-    res.locals.session = req.session;
-    next();
-});
-
-function ensureLogin(req, res, next) {
-if (!req.session.user) {
-    res.redirect('/login');
-} else {
-    next();
-}
-}
 
 app.get('/login', (req, res) => {
-    if (req.session && req.session.user) 
+    if (req.session && req.session.user) {
         return res.redirect('/solutions/projects');
-    res.render('login', { errorMessage: "", userName: "" });
+    }
+    res.render('login', { 
+        errorMessage: "", 
+        userName: "", 
+        page: "/login" 
+    });
 });
 app.get('/register', (req, res) => {
-    res.render('register', { errorMessage: "", successMessage: "", userName: "" });
+    res.render('register', { errorMessage: "", successMessage: "", userName: "", page: "/register" });
 });
 
 app.post('/register', (req, res) => {
     authData.registerUser(req.body)
         .then(() => {
-        res.render('register', {
-            errorMessage: "",
-            successMessage: "User created",
-            userName: ""
-        });
+        res.render('register', { 
+            errorMessage: "", 
+            successMessage: "User created", 
+            userName: "", 
+            page: "/register" });
         })
         .catch(err => {
         res.render('register', {
             errorMessage: String(err),
             successMessage: "",
-            userName: req.body.userName || ""
+            userName: req.body.userName || "",
+            page: "/register"
         });
+        
     });
 });
 
 app.post('/login', (req, res) => {
 req.body.userAgent = req.get('User-Agent');
-    authData.checkUser(req.body)
+
+authData.checkUser(req.body)
     .then(user => {
     req.session.user = {
         userName: user.userName,
         email: user.email,
         loginHistory: user.loginHistory
     };
-    res.redirect('/dashboard');
+    res.redirect('/solutions/projects');
     })
     .catch(err => {
-    res.render('login', { message: String(err) });
+    res.render('login', {
+        errorMessage: String(err),
+        userName: req.body.userName || "",
+        page: "/login"
+    });
     });
 });
 app.get('/logout', (req, res) => {
@@ -251,12 +252,8 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 app.get('/userHistory', ensureLogin, (req, res) => {
-    res.render('userHistory');
+    res.render('userHistory', { page: "/userHistory" });
 });
-
-// app.get('/dashboard', (req, res) => {
-//     res.render('dashboard', { user: req.session.user });
-// });
 
 //Update all routes that allow users to add, edit, or delete Projects
 // add
@@ -297,5 +294,7 @@ app.get('/solutions/deleteProject/:id', ensureLogin, (req, res) => {
     .catch(err => res.render('500', { message: `error: ${err}`, page: '500' }));
 });
 
-app.listen(HTTP_PORT, () => console.log("Server responded"));
 
+app.use((req, res) => {
+    res.status(404).render("404", { message: "Page Not Found", page: "" });
+});

@@ -31,41 +31,49 @@
             </div>
         </div>
 
-        <div class="my-10">
-            <h2 class="text-3xl font-bold mb-4 text-center">Project List</h2>
-            <table class="table-auto w-full border border-gray-300">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="border px-4 py-2">Title</th>
-                        <th class="border px-4 py-2">Sector</th>
-                        <th class="border px-4 py-2">Summary</th>
-                        <th class="border px-4 py-2">Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (projects && projects.length > 0) { %>
-                        <% for (let i = 0; i < projects.length; i++) { %>
-                            <tr>
-                                <td class="border px-4 py-2"><%= projects[i].title %></td>
-                                <td class="border px-4 py-2">
-                                    <a href="/solutions/projects?sector=<%= projects[i]['Sector.sector_name'] %>" class="btn btn-sm btn-outline">
-                                        <%= projects[i]['Sector.sector_name'] %>
-                                    </a>
-                                </td>
-                                <td class="border px-4 py-2"><%= projects[i].summary_short %></td>
-                                <td class="border">
-                                    <a href="/solutions/projects/<%= projects[i].id %>" class="btn mt-2 btn-xs">Details</a>
-                                </td>
-                            </tr>
-                        <% } %>
-                    <% } else { %>
-                        <tr>
-                            <td colspan="4" class="text-center p-4">No projects found.</td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
+    <div class="my-10">
+    <h2 class="text-3xl font-bold mb-4 text-center">Project List</h2>
+    <table class="table-auto w-full border border-gray-300">
+        <thead class="bg-gray-100">
+        <tr>
+            <th class="border px-4 py-2">Title</th>
+            <th class="border px-4 py-2">Sector</th>
+            <th class="border px-4 py-2">Summary</th>
+            <th class="border px-4 py-2">Details</th>
+            <% if (session && session.user) { %>
+            <th class="border px-4 py-2">Edit</th>
+            <% } %>
+        </tr>
+        </thead>
+        <tbody>
+        <% if (projects && projects.length > 0) { %>
+            <% for (let i = 0; i < projects.length; i++) { %>
+            <tr>
+                <td class="border px-4 py-2"><%= projects[i].title %></td>
+                <td class="border px-4 py-2">
+                <a href="/solutions/projects?sector=<%= projects[i]['Sector.sector_name'] %>" class="btn btn-sm btn-outline">
+                    <%= projects[i]['Sector.sector_name'] %>
+                </a>
+                </td>
+                <td class="border px-4 py-2"><%= projects[i].summary_short %></td>
+                <td class="border px-4 py-2">
+                <a href="/solutions/projects/<%= projects[i].id %>" class="btn mt-2 btn-xs">Details</a>
+                </td>
+                <% if (session && session.user) { %>
+                <td class="border px-4 py-2">
+                    <a href="/solutions/editProject/<%= projects[i].id %>" class="btn mt-2 btn-xs btn-warning">Edit</a>
+                </td>
+                <% } %>
+            </tr>
+            <% } %>
+        <% } else { %>
+            <tr>
+            <td colspan="<%= (session && session.user) ? 5 : 4 %>" class="text-center p-4">No projects found.</td>
+            </tr>
+        <% } %>
+        </tbody>
+    </table>
     </div>
+        </div>
 </body>
 </html>

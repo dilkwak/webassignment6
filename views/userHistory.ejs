@@ -1,11 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="/css/main.css">
+<title>User History</title>
 </head>
 <body>
-    
+<%- include('partials/navbar') %>
+
+<div class="container mx-auto px-6 py-6">
+    <div class="hero bg-base-200 rounded-box mb-8">
+    <div class="hero-content text-center">
+        <div class="max-w-md">
+        <h1 class="text-5xl font-bold"><%= session.user.userName %></h1>
+        <p class="py-6">User History: <%= session.user.email %></p>
+        </div>
+    </div>
+    </div>
+
+    <div class="overflow-x-auto">
+    <table class="table table-zebra w-full">
+        <thead>
+        <tr>
+            <th>Login Date/Time</th>
+            <th>Client Information</th>
+        </tr>
+        </thead>
+
+        <% // ↓ Add this helper line before the tbody %>
+        <% const items = (session && session.user && Array.isArray(session.user.loginHistory)) ? session.user.loginHistory : []; %>
+
+        <tbody>
+        <% items.forEach(h => { %>
+            <tr>
+            <td><%= new Date(h.dateTime).toString() %></td>
+            <td class="whitespace-pre-line break-words"><%= h.userAgent %></td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+    </div>
+</div>
 </body>
 </html>
